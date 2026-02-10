@@ -1,0 +1,1036 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trip to Eden</title>
+    <link rel="icon" href="logotriptoeden.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@300;400&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Sky background -->
+    <div class="sky-canvas"></div>
+    <div class="clouds-wrap" id="cloudsWrap"></div>
+
+    <!-- Navigation dots -->
+    <nav class="nav-dots" id="navDots">
+      <button class="nav-dot active" data-page="0" title="Entrada"></button>
+      <button class="nav-dot" data-page="1" title="La carta"></button>
+      <button class="nav-dot" data-page="2" title="Tu asiento"></button>
+    </nav>
+
+    <!-- ══════════════════════════════════════════════
+       PAGE 1 – ENTRADA
+  ══════════════════════════════════════════════ -->
+    <section class="section" id="page-entry">
+      <div class="logo-wrap">
+        <img
+          class="logo-img"
+          src="logotriptoeden.png"
+          alt="Trip to Eden"
+          onerror="
+            this.style.display = 'none';
+            document.querySelector('.logo-text-fallback').style.display =
+              'block';
+          "
+        />
+        <div class="logo-text-fallback">Trip to Eden</div>
+        <span class="logo-subtitle">a journey to your other half</span>
+      </div>
+
+      <div class="entry-form">
+        <div class="input-field-wrap">
+          <label class="input-label" for="nameInput">¿Cuál es tu nombre?</label>
+          <input
+            class="name-input"
+            id="nameInput"
+            type="text"
+            placeholder=" "
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <span class="feather-hint">✦</span>
+          <div class="input-shimmer"></div>
+        </div>
+
+        <button class="btn-enter" id="btnEnter">Continuar</button>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+       PAGE 2 – LA CARTA
+  ══════════════════════════════════════════════ -->
+    <section class="section" id="page-letter">
+      <p class="greeting-name" id="greetingName"></p>
+
+      <div class="envelope-wrap" id="envelopeWrap">
+        <img
+          class="envelope-img"
+          src="carta.png"
+          alt="Tu carta"
+          id="envelopeImg"
+          onerror="
+            this.style.display = 'none';
+            document.getElementById('envelopeFallback').style.display = 'flex';
+          "
+        />
+        <div
+          class="envelope-fallback"
+          id="envelopeFallback"
+          style="display: none"
+        >
+          ✉
+        </div>
+        <span class="click-hint">— toca para abrir —</span>
+      </div>
+    </section>
+
+    <!-- Puzzle overlay -->
+    <div class="puzzle-overlay" id="puzzleOverlay">
+      <div class="puzzle-box">
+        <p class="puzzle-title">desliza para abrir el sobre</p>
+        <div class="slider-track" id="sliderTrack">
+          <div class="slider-fill" id="sliderFill"></div>
+          <span class="slider-label" id="sliderLabel">desliza →</span>
+          <div class="slider-handle" id="sliderHandle"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Letter content card -->
+    <div class="letter-card-overlay" id="letterOverlay">
+      <div class="letter-card">
+        <button class="letter-close" id="letterClose">× CERRAR</button>
+
+        <img
+          class="letter-logo"
+          src="logotriptoeden.png"
+          alt="Trip to Eden"
+          onerror="this.style.display = 'none'"
+        />
+
+        <div class="letter-divider"></div>
+
+        <p class="letter-salutation" id="letterSalutation">Querida,</p>
+
+        <p class="letter-body">
+          Has sido seleccionada para participar en
+          <strong>Trip to Eden</strong>. <br /><br />
+          Somos una startup especializada en encontrar a tu media naranja.
+          Deberás rellenar un breve formulario y seguir unos sencillos pasos.
+          <br /><br />
+          Sé sincera en tus respuestas, y déjalo todo en nuestras manos.<br />
+          El amor verdadero te espera al otro lado del cielo.
+        </p>
+
+        <div class="letter-divider"></div>
+
+        <!-- <p class="letter-seal">✦</p> -->
+        <!-- <p class="letter-signature">con cariño, Trip to Eden</p> -->
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+       PAGE 3 – ELIGE TU ASIENTO
+  ══════════════════════════════════════════════ -->
+    <section class="section" id="page-seats">
+      <div class="seats-header">
+        <h2 class="seats-title">Elige tu asiento</h2>
+        <p class="seats-subtitle">cada lugar guarda una experiencia distinta</p>
+      </div>
+
+      <div class="cabin" id="cabin">
+        <!-- Rows generated by JS -->
+      </div>
+
+      <div class="btn-takeoff-wrap">
+        <button class="btn-takeoff" id="btnTakeoff">✦ &nbsp; Despegar</button>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+       COUNTDOWN OVERLAY
+  ══════════════════════════════════════════════ -->
+    <div class="countdown-overlay" id="countdownOverlay">
+      <div class="countdown-num" id="countdownNum">3</div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+       PAGE 4 – FORMULARIO
+  ══════════════════════════════════════════════ -->
+    <section class="section" id="page-form">
+      <div class="form-shell">
+        <div class="form-progress-bar">
+          <div class="form-progress-fill" id="formProgressFill"></div>
+        </div>
+        <span class="form-progress-label" id="formProgressLabel">1 / 12</span>
+        <div class="form-question-wrap" id="formQuestionWrap"></div>
+        <div class="form-nav">
+          <button class="form-nav-btn" id="formPrev">‹ &nbsp;Anterior</button>
+          <button class="form-nav-btn primary" id="formNext">
+            Siguiente &nbsp;›
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+       PAGE 5 – THANK YOU
+  ══════════════════════════════════════════════ -->
+    <div
+      class="page-thankyou"
+      id="page-thankyou"
+      style="display: none; opacity: 0"
+    >
+      <div class="ty-content">
+        <img
+          class="ty-logo"
+          src="logotriptoeden.png"
+          alt="Trip to Eden"
+          onerror="this.style.display = 'none'"
+        />
+        <div class="ty-divider"></div>
+        <p class="ty-title">Tu historia comienza ahora.</p>
+        <p class="ty-body">
+          Hemos recibido tu alma. Nuestro equipo estudiará cada respuesta con el
+          cuidado que mereces.<br /><br />Cuando el momento sea el correcto, el
+          cielo te enviará una señal.
+        </p>
+        <p class="ty-seal">✦</p>
+        <p class="ty-sign">con cariño, Trip to Eden</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+       JAVASCRIPT
+  ══════════════════════════════════════════════ -->
+    <script src="script.js"></script>
+        { w: 260, h: 80 },
+        { w: 180, h: 55 },
+        { w: 320, h: 90 },
+        { w: 140, h: 45 },
+        { w: 220, h: 65 },
+        { w: 380, h: 100 },
+        { w: 170, h: 50 },
+      ];
+
+      function makeSVGCloud(w, h, id) {
+        const ns = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(ns, "svg");
+        svg.setAttribute("width", w);
+        svg.setAttribute("height", h);
+        svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+
+        const stops = [
+          { offset: "0%", color: "rgba(255,255,255,0.95)" },
+          { offset: "60%", color: "rgba(235,242,252,0.85)" },
+          { offset: "100%", color: "rgba(220,232,248,0.6)" },
+        ];
+
+        const defs = document.createElementNS(ns, "defs");
+        const grad = document.createElementNS(ns, "radialGradient");
+        grad.setAttribute("id", `cg${id}`);
+        grad.setAttribute("cx", "50%");
+        grad.setAttribute("cy", "40%");
+        grad.setAttribute("r", "55%");
+        stops.forEach((s) => {
+          const st = document.createElementNS(ns, "stop");
+          st.setAttribute("offset", s.offset);
+          st.setAttribute("stop-color", s.color);
+          grad.appendChild(st);
+        });
+        defs.appendChild(grad);
+        svg.appendChild(defs);
+
+        const cx = w / 2,
+          cy = h * 0.55,
+          rx = w * 0.45,
+          ry = h * 0.38;
+
+        // Base ellipse
+        const base = document.createElementNS(ns, "ellipse");
+        base.setAttribute("cx", cx);
+        base.setAttribute("cy", cy);
+        base.setAttribute("rx", rx);
+        base.setAttribute("ry", ry);
+        base.setAttribute("fill", `url(#cg${id})`);
+        svg.appendChild(base);
+
+        // Puff circles on top
+        [
+          [0.25, 0.35, 0.28],
+          [0.5, 0.22, 0.32],
+          [0.75, 0.32, 0.26],
+        ].forEach(([px, py, pr]) => {
+          const c = document.createElementNS(ns, "circle");
+          c.setAttribute("cx", w * px);
+          c.setAttribute("cy", h * py);
+          c.setAttribute("r", Math.min(w, h) * pr);
+          c.setAttribute("fill", `url(#cg${id})`);
+          svg.appendChild(c);
+        });
+
+        return svg;
+      }
+
+      function spawnClouds() {
+        const wrap = document.getElementById("cloudsWrap");
+        const count = 14;
+        for (let i = 0; i < count; i++) {
+          const def = CLOUD_DATA[i % CLOUD_DATA.length];
+          const scale = 0.7 + Math.random() * 0.9;
+          const w = Math.round(def.w * scale);
+          const h = Math.round(def.h * scale);
+
+          const cloud = document.createElement("div");
+          cloud.classList.add("cloud");
+          cloud.style.top = Math.random() * 90 + "%";
+          cloud.style.left = -w + "px";
+
+          const dur = 45 + Math.random() * 50;
+          const delay = -Math.random() * dur;
+          cloud.style.animation = `floatCloud ${dur}s linear ${delay}s infinite`;
+          cloud.style.opacity = (0.4 + Math.random() * 0.5).toString();
+
+          cloud.appendChild(makeSVGCloud(w, h, i));
+          wrap.appendChild(cloud);
+        }
+      }
+
+      spawnClouds();
+
+      /* ─── Nav dots & scroll tracking ─────────────────────────────── */
+      const sections = ["page-entry", "page-letter", "page-seats"];
+      const dots = document.querySelectorAll(".nav-dot");
+
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const idx = parseInt(dot.dataset.page);
+          document
+            .getElementById(sections[idx])
+            .scrollIntoView({ behavior: "smooth" });
+        });
+      });
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              const idx = sections.indexOf(e.target.id);
+              dots.forEach((d, i) => d.classList.toggle("active", i === idx));
+            }
+          });
+        },
+        { threshold: 0.6 },
+      );
+
+      sections.forEach((id) => observer.observe(document.getElementById(id)));
+
+      /* ─── Page 1 – Name & Enter ───────────────────────────────────── */
+      let userName = "";
+      const nameInput = document.getElementById("nameInput");
+      const btnEnter = document.getElementById("btnEnter");
+
+      btnEnter.addEventListener("click", goToLetter);
+      nameInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") goToLetter();
+      });
+
+      function goToLetter() {
+        userName = nameInput.value.trim() || "";
+        const greeting = document.getElementById("greetingName");
+        greeting.textContent = userName
+          ? `Bienvenida, ${userName}`
+          : "Bienvenida";
+        document.getElementById("letterSalutation").textContent = userName
+          ? `Querida ${userName},`
+          : "Querida,";
+        document
+          .getElementById("page-letter")
+          .scrollIntoView({ behavior: "smooth" });
+      }
+
+      /* ─── Page 2 – Envelope & Slider ─────────────────────────────── */
+      const envelopeWrap = document.getElementById("envelopeWrap");
+      const puzzleOverlay = document.getElementById("puzzleOverlay");
+      const letterOverlay = document.getElementById("letterOverlay");
+      const letterClose = document.getElementById("letterClose");
+
+      envelopeWrap.addEventListener("click", () => {
+        puzzleOverlay.classList.add("active");
+      });
+
+      letterClose.addEventListener("click", () => {
+        letterOverlay.classList.remove("active");
+      });
+
+      // Slider drag
+      const track = document.getElementById("sliderTrack");
+      const handle = document.getElementById("sliderHandle");
+      const fill = document.getElementById("sliderFill");
+      const label = document.getElementById("sliderLabel");
+
+      let dragging = false,
+        startX = 0,
+        currentLeft = 0;
+      const handleW = 52;
+
+      function getTrackWidth() {
+        return track.getBoundingClientRect().width;
+      }
+
+      function startDrag(clientX) {
+        dragging = true;
+        startX = clientX - currentLeft;
+        handle.style.transition = "none";
+        fill.style.transition = "none";
+      }
+
+      function doDrag(clientX) {
+        if (!dragging) return;
+        const tw = getTrackWidth();
+        const max = tw - handleW;
+        let pos = clientX - startX;
+        pos = Math.max(0, Math.min(pos, max));
+        currentLeft = pos;
+        handle.style.left = pos + "px";
+        fill.style.width = pos + handleW + "px";
+
+        const pct = pos / max;
+        label.style.opacity = Math.max(0, 1 - pct * 2.5).toString();
+
+        if (pct >= 0.92) finishSlide();
+      }
+
+      function endDrag() {
+        if (!dragging) return;
+        dragging = false;
+        const tw = getTrackWidth();
+        const max = tw - handleW;
+        if (currentLeft / max < 0.92) resetSlider();
+      }
+
+      function resetSlider() {
+        handle.style.transition = "left 0.4s cubic-bezier(.16,1,.3,1)";
+        fill.style.transition = "width 0.4s cubic-bezier(.16,1,.3,1)";
+        handle.style.left = "0";
+        fill.style.width = handleW + "px";
+        label.style.opacity = "1";
+        currentLeft = 0;
+      }
+
+      function finishSlide() {
+        dragging = false;
+        puzzleOverlay.classList.remove("active");
+        resetSlider();
+        setTimeout(() => letterOverlay.classList.add("active"), 300);
+      }
+
+      // Mouse events
+      handle.addEventListener("mousedown", (e) => startDrag(e.clientX));
+      window.addEventListener("mousemove", (e) => doDrag(e.clientX));
+      window.addEventListener("mouseup", () => endDrag());
+
+      // Touch events
+      handle.addEventListener(
+        "touchstart",
+        (e) => {
+          e.preventDefault();
+          startDrag(e.touches[0].clientX);
+        },
+        { passive: false },
+      );
+      window.addEventListener("touchmove", (e) => doDrag(e.touches[0].clientX));
+      window.addEventListener("touchend", () => endDrag());
+
+      /* ─── Page 3 – Seat map ───────────────────────────────────────── */
+      const SEAT_INFO = {
+        window: {
+          icon: "🌅",
+          title: "Asiento de ventanilla",
+          desc: "El horizonte es tuyo. Contempla el cielo despejado y siente la suave luz del amanecer mientras el mundo queda atrás.",
+        },
+        innerLeft: {
+          icon: "🌸",
+          title: "Asiento interior izquierdo",
+          desc: "Rodeada de tranquilidad. Un aroma suave a flores envuelve el ambiente, perfecto para reflexionar en calma.",
+        },
+        innerRight: {
+          icon: "✨",
+          title: "Asiento interior derecho",
+          desc: "Lleno de luz difusa y calidez. Cada instante aquí vibra con una energía serena y misteriosa.",
+        },
+        aisle: {
+          icon: "🕊️",
+          title: "Asiento de pasillo",
+          desc: "Libertad y movimiento. Eres la primera en alzar el vuelo y la primera en descubrir lo que te espera.",
+        },
+      };
+
+      const ROWS = ["A", "B", "C", "D"];
+      const cabin = document.getElementById("cabin");
+
+      ROWS.forEach((row, ri) => {
+        const rowEl = document.createElement("div");
+        rowEl.classList.add("seat-row");
+
+        // Row number
+        const rn = document.createElement("span");
+        rn.classList.add("row-num");
+        rn.textContent = row;
+        rowEl.appendChild(rn);
+
+        // 4 seats: [window, inner | aisle, inner-right, window]
+        // Layout: W  I  |  I  W
+        const seatTypes = ["window", "innerLeft", "innerRight", "aisle"];
+        const labels = [`${row}1`, `${row}2`, `${row}3`, `${row}4`];
+        const types = ["window", "innerLeft", "aisle", "window"]; // per column
+
+        [
+          { id: `${row}1`, type: "window" },
+          { id: `${row}2`, type: "innerLeft" },
+        ].forEach((s) => rowEl.appendChild(makeSeat(s.id, s.type)));
+
+        const aisle = document.createElement("div");
+        aisle.classList.add("aisle");
+        rowEl.appendChild(aisle);
+
+        [
+          { id: `${row}3`, type: "innerRight" },
+          { id: `${row}4`, type: "window" },
+        ].forEach((s) => rowEl.appendChild(makeSeat(s.id, s.type)));
+
+        cabin.appendChild(rowEl);
+      });
+
+      function makeSeat(id, type) {
+        const info = SEAT_INFO[type];
+        const seat = document.createElement("div");
+        seat.classList.add("seat");
+        seat.setAttribute("data-id", id);
+
+        const ping = document.createElement("div");
+        ping.classList.add("seat-ping");
+        seat.appendChild(ping);
+
+        const tip = document.createElement("div");
+        tip.classList.add("seat-tooltip");
+        tip.innerHTML = `
+      <div class="tooltip-icon">${info.icon}</div>
+      <div class="tooltip-seat-id">Asiento ${id}</div>
+      <div class="tooltip-body">${info.desc}</div>
+    `;
+
+        seat.appendChild(tip);
+        return seat;
+      }
+
+      /* ─── Takeoff button ─────────────────────────────────────────── */
+      document.getElementById("btnTakeoff").addEventListener("click", () => {
+        const btn = document.getElementById("btnTakeoff");
+        btn.style.opacity = "0.5";
+        btn.style.pointerEvents = "none";
+        btn.innerHTML = "✦ &nbsp; Despegando…";
+        setTimeout(startCountdown, 800);
+      });
+
+      /* ─── Countdown 3 2 1 ────────────────────────────────────────── */
+      function startCountdown() {
+        const overlay = document.getElementById("countdownOverlay");
+        overlay.classList.add("active");
+        const num = document.getElementById("countdownNum");
+        const counts = ["3", "2", "1", "✦"];
+        let i = 0;
+        function tick() {
+          num.classList.remove("pop");
+          void num.offsetWidth;
+          num.textContent = counts[i];
+          num.classList.add("pop");
+          i++;
+          if (i < counts.length) {
+            setTimeout(tick, 900);
+          } else {
+            setTimeout(() => {
+              overlay.classList.remove("active");
+              showFormPage();
+            }, 700);
+          }
+        }
+        tick();
+      }
+
+      /* ─── Form logic ─────────────────────────────────────────────── */
+      const QUESTIONS = [
+        {
+          id: "q1",
+          type: "single",
+          question: "¿Crees en el amor a primera vista?",
+          sub: "Esa chispa que lo cambia todo en un instante.",
+          options: [
+            "Completamente",
+            "Puede que sí",
+            "Soy escéptica",
+            "No lo creo",
+          ],
+        },
+        {
+          id: "q2",
+          type: "single",
+          question: "¿Crees en el destino?",
+          sub: "Que hay alguien escrito para ti en algún lugar del universo.",
+          options: [
+            "Sí, lo siento profundamente",
+            "Creo que el destino se construye",
+            "A veces lo dudo",
+            "Prefiero la casualidad",
+          ],
+        },
+        {
+          id: "q3",
+          type: "slider_range",
+          question: "¿Qué importancia tiene el aspecto físico?",
+          sub: "Desliza para indicar cuánto peso tiene en tu decisión.",
+          min: 0,
+          max: 10,
+          labels: ["Nada", "Es lo primero"],
+        },
+        {
+          id: "q4",
+          type: "multi",
+          question: "¿Qué cualidades buscas en tu media naranja?",
+          sub: "Elige todas las que resuenen contigo.",
+          options: [
+            "Sentido del humor",
+            "Inteligencia emocional",
+            "Ambición",
+            "Ternura",
+            "Aventurero/a",
+            "Estabilidad",
+            "Creatividad",
+            "Lealtad",
+          ],
+        },
+        {
+          id: "q5",
+          type: "slider_range",
+          question: "¿Introvertido/a o extrovertido/a?",
+          sub: "Describe cómo te imaginas a esa persona en sociedad.",
+          min: 0,
+          max: 10,
+          labels: ["Muy introvertido/a", "Muy extrovertido/a"],
+        },
+        {
+          id: "q6",
+          type: "text",
+          question: "Describe tu plan de cita perfecta.",
+          sub: "Con todo detalle. No hay respuesta incorrecta.",
+          placeholder: "Una cena tranquila al atardecer, tal vez junto al mar…",
+        },
+        {
+          id: "q7",
+          type: "single",
+          question: "¿Cómo prefieres que sea la relación al principio?",
+          sub: "El ritmo marca mucho el tono de todo lo que viene después.",
+          options: [
+            "Lenta y misteriosa",
+            "Natural y espontánea",
+            "Intensa desde el inicio",
+            "Que fluya sola",
+          ],
+        },
+        {
+          id: "q8",
+          type: "multi",
+          question: "¿Qué planes os imaginas compartiendo?",
+          sub: "Elige los que sientas como tuyos.",
+          options: [
+            "Viajes al extranjero",
+            "Noches en casa",
+            "Aventuras al aire libre",
+            "Conciertos y cultura",
+            "Proyectos en común",
+            "Cocinar juntos",
+            "Deporte",
+            "Lectura en silencio",
+          ],
+        },
+        {
+          id: "q9",
+          type: "slider_range",
+          question: "¿Qué equilibrio buscas entre independencia y unión?",
+          sub: "Cada pareja tiene su propia constelación.",
+          min: 0,
+          max: 10,
+          labels: ["Mucha independencia", "Siempre juntos"],
+        },
+        {
+          id: "q10",
+          type: "single",
+          question: "¿Qué te enamora primero de alguien?",
+          sub: "Ese pequeño detalle que lo cambia todo.",
+          options: ["La mirada", "La voz", "La forma de reír", "Lo que dice"],
+        },
+        {
+          id: "q11",
+          type: "text",
+          question:
+            "Si pudieras dejarle una nota a tu media naranja hoy, ¿qué le dirías?",
+          sub: "Escríbele como si pudiera leerla ahora mismo.",
+          placeholder: "Hola, no sé dónde estás, pero…",
+        },
+        {
+          id: "q12",
+          type: "signature",
+          question: "Para finalizar, firma aquí.",
+          sub: "Tu firma es tu sello. Confirma que todo lo que has respondido viene de tu corazón.",
+        },
+      ];
+
+      let currentQ = 0;
+      const answers = {};
+
+      function showFormPage() {
+        const pf = document.getElementById("page-form");
+        pf.classList.add("visible");
+        pf.style.display = "flex";
+        requestAnimationFrame(() => {
+          pf.scrollIntoView({ behavior: "smooth" });
+        });
+        // Add form nav dot
+        const nd = document.createElement("button");
+        nd.classList.add("nav-dot");
+        nd.dataset.page = "3";
+        nd.title = "Formulario";
+        nd.addEventListener("click", () =>
+          document
+            .getElementById("page-form")
+            .scrollIntoView({ behavior: "smooth" }),
+        );
+        document.getElementById("navDots").appendChild(nd);
+        renderQuestion(0);
+      }
+
+      function renderQuestion(idx) {
+        currentQ = idx;
+        const q = QUESTIONS[idx];
+        const container = document.getElementById("formQuestionWrap");
+
+        // Update progress
+        const pct = (idx / (QUESTIONS.length - 1)) * 100;
+        document.getElementById("formProgressFill").style.width = pct + "%";
+        document.getElementById("formProgressLabel").textContent =
+          `${idx + 1} / ${QUESTIONS.length}`;
+
+        // Fade out then swap
+        container.style.opacity = "0";
+        container.style.transform = "translateY(16px)";
+
+        setTimeout(() => {
+          container.innerHTML = buildQuestion(q);
+          attachQuestionEvents(q);
+          restoreAnswer(q);
+          container.style.transition =
+            "opacity 0.5s ease, transform 0.5s cubic-bezier(.16,1,.3,1)";
+          container.style.opacity = "1";
+          container.style.transform = "translateY(0)";
+        }, 220);
+
+        // Prev/Next buttons
+        const prevBtn = document.getElementById("formPrev");
+        const nextBtn = document.getElementById("formNext");
+        prevBtn.style.opacity = idx === 0 ? "0.2" : "1";
+        prevBtn.style.pointerEvents = idx === 0 ? "none" : "all";
+        nextBtn.innerHTML =
+          idx === QUESTIONS.length - 1 ? "Enviar &nbsp;✦" : "Siguiente &nbsp;›";
+      }
+
+      function buildQuestion(q) {
+        let html = `
+      <p class="fq-label">Pregunta ${QUESTIONS.indexOf(q) + 1}</p>
+      <h2 class="fq-title">${q.question}</h2>
+      <p class="fq-sub">${q.sub || ""}</p>
+    `;
+
+        if (q.type === "single") {
+          html += `<div class="fq-options single-options">`;
+          q.options.forEach((opt, i) => {
+            html += `<button class="fq-option" data-val="${opt}">${opt}</button>`;
+          });
+          html += `</div>`;
+        }
+
+        if (q.type === "multi") {
+          html += `<div class="fq-options multi-options">`;
+          q.options.forEach((opt) => {
+            html += `<button class="fq-option" data-val="${opt}">${opt}</button>`;
+          });
+          html += `</div><p class="fq-hint">Puedes elegir varias</p>`;
+        }
+
+        if (q.type === "slider_range") {
+          html += `
+        <div class="fq-slider-wrap">
+          <div class="fq-slider-labels">
+            <span>${q.labels[0]}</span><span>${q.labels[1]}</span>
+          </div>
+          <div class="fq-slider-track">
+            <div class="fq-slider-fill" id="fqFill"></div>
+            <div class="fq-slider-thumb" id="fqThumb"></div>
+          </div>
+          <div class="fq-slider-value" id="fqValue">—</div>
+        </div>`;
+        }
+
+        if (q.type === "text") {
+          html += `
+        <div class="fq-text-wrap">
+          <textarea class="fq-textarea" id="fqText" placeholder="${q.placeholder || ""}" rows="4"></textarea>
+        </div>`;
+        }
+
+        if (q.type === "signature") {
+          html += `
+        <div class="fq-sig-wrap">
+          <canvas class="sig-canvas" id="sigCanvas"></canvas>
+          <button class="sig-clear" id="sigClear">Borrar</button>
+        </div>`;
+        }
+
+        return html;
+      }
+
+      function attachQuestionEvents(q) {
+        if (q.type === "single") {
+          document.querySelectorAll(".fq-option").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              document
+                .querySelectorAll(".fq-option")
+                .forEach((b) => b.classList.remove("selected"));
+              btn.classList.add("selected");
+              answers[q.id] = btn.dataset.val;
+            });
+          });
+        }
+
+        if (q.type === "multi") {
+          document.querySelectorAll(".fq-option").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              btn.classList.toggle("selected");
+              if (!answers[q.id]) answers[q.id] = [];
+              const val = btn.dataset.val;
+              if (btn.classList.contains("selected")) {
+                answers[q.id].push(val);
+              } else {
+                answers[q.id] = answers[q.id].filter((v) => v !== val);
+              }
+            });
+          });
+        }
+
+        if (q.type === "slider_range") {
+          initFQSlider(q);
+        }
+
+        if (q.type === "text") {
+          const ta = document.getElementById("fqText");
+          ta.addEventListener("input", () => {
+            answers[q.id] = ta.value;
+          });
+        }
+
+        if (q.type === "signature") {
+          initSignature(q);
+        }
+      }
+
+      function restoreAnswer(q) {
+        const ans = answers[q.id];
+        if (!ans) return;
+
+        if (q.type === "single") {
+          document.querySelectorAll(".fq-option").forEach((btn) => {
+            if (btn.dataset.val === ans) btn.classList.add("selected");
+          });
+        }
+
+        if (q.type === "multi") {
+          document.querySelectorAll(".fq-option").forEach((btn) => {
+            if (ans.includes(btn.dataset.val)) btn.classList.add("selected");
+          });
+        }
+
+        if (q.type === "text") {
+          const ta = document.getElementById("fqText");
+          if (ta) ta.value = ans;
+        }
+
+        if (q.type === "slider_range" && typeof ans === "number") {
+          // Slider restores inside initFQSlider via answers check
+        }
+      }
+
+      /* ── Form Range Slider ─────── */
+      function initFQSlider(q) {
+        const track = document.querySelector(".fq-slider-track");
+        const thumb = document.getElementById("fqThumb");
+        const fill = document.getElementById("fqFill");
+        const valEl = document.getElementById("fqValue");
+
+        let dragging = false;
+        let value = answers[q.id] !== undefined ? answers[q.id] : 5;
+
+        function setVal(v) {
+          value = Math.max(0, Math.min(10, Math.round(v)));
+          const pct = value / 10;
+          const tw = track.getBoundingClientRect().width;
+          const thumbW = 32;
+          const pos = pct * (tw - thumbW);
+          thumb.style.left = pos + "px";
+          fill.style.width = pos + thumbW / 2 + "px";
+          valEl.textContent = value;
+          answers[q.id] = value;
+        }
+
+        function posToVal(clientX) {
+          const rect = track.getBoundingClientRect();
+          const thumbW = 32;
+          const pct = Math.max(
+            0,
+            Math.min(
+              1,
+              (clientX - rect.left - thumbW / 2) / (rect.width - thumbW),
+            ),
+          );
+          return pct * 10;
+        }
+
+        thumb.addEventListener("mousedown", () => (dragging = true));
+        window.addEventListener("mousemove", (e) => {
+          if (dragging) setVal(posToVal(e.clientX));
+        });
+        window.addEventListener("mouseup", () => (dragging = false));
+
+        thumb.addEventListener(
+          "touchstart",
+          (e) => {
+            dragging = true;
+            e.preventDefault();
+          },
+          { passive: false },
+        );
+        window.addEventListener("touchmove", (e) => {
+          if (dragging) setVal(posToVal(e.touches[0].clientX));
+        });
+        window.addEventListener("touchend", () => (dragging = false));
+
+        track.addEventListener("click", (e) => setVal(posToVal(e.clientX)));
+
+        // Init position after layout
+        requestAnimationFrame(() => setVal(value));
+      }
+
+      /* ── Signature Canvas ─────── */
+      function initSignature(q) {
+        const canvas = document.getElementById("sigCanvas");
+        const ctx = canvas.getContext("2d");
+        const wrap = canvas.parentElement;
+
+        function resize() {
+          const w = wrap.getBoundingClientRect().width - 2;
+          canvas.width = w;
+          canvas.height = 160;
+        }
+        resize();
+        window.addEventListener("resize", resize);
+
+        ctx.strokeStyle = "#3a4a5c";
+        ctx.lineWidth = 1.8;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        let drawing = false,
+          lastX = 0,
+          lastY = 0;
+
+        function getPos(e) {
+          const rect = canvas.getBoundingClientRect();
+          const src = e.touches ? e.touches[0] : e;
+          return { x: src.clientX - rect.left, y: src.clientY - rect.top };
+        }
+
+        function start(e) {
+          e.preventDefault();
+          drawing = true;
+          const p = getPos(e);
+          lastX = p.x;
+          lastY = p.y;
+        }
+        function draw(e) {
+          if (!drawing) return;
+          e.preventDefault();
+          const p = getPos(e);
+          ctx.beginPath();
+          ctx.moveTo(lastX, lastY);
+          ctx.lineTo(p.x, p.y);
+          ctx.stroke();
+          lastX = p.x;
+          lastY = p.y;
+          answers[q.id] = canvas.toDataURL();
+        }
+        function stop() {
+          drawing = false;
+          ctx.beginPath();
+        }
+
+        canvas.addEventListener("mousedown", start);
+        canvas.addEventListener("mousemove", draw);
+        canvas.addEventListener("mouseup", stop);
+        canvas.addEventListener("mouseleave", stop);
+        canvas.addEventListener("touchstart", start, { passive: false });
+        canvas.addEventListener("touchmove", draw, { passive: false });
+        canvas.addEventListener("touchend", stop);
+
+        document.getElementById("sigClear").addEventListener("click", () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          delete answers[q.id];
+        });
+      }
+
+      /* ── Form Nav ───── */
+      document.getElementById("formPrev").addEventListener("click", () => {
+        if (currentQ > 0) renderQuestion(currentQ - 1);
+      });
+
+      document.getElementById("formNext").addEventListener("click", () => {
+        if (currentQ < QUESTIONS.length - 1) {
+          renderQuestion(currentQ + 1);
+        } else {
+          submitForm();
+        }
+      });
+
+      /* ── Submit ───── */
+      function submitForm() {
+        document.getElementById("page-form").style.opacity = "0";
+        document.getElementById("page-form").style.transition =
+          "opacity 0.8s ease";
+        setTimeout(() => {
+          document.getElementById("page-form").style.display = "none";
+          document.getElementById("page-thankyou").style.display = "flex";
+          requestAnimationFrame(() => {
+            document.getElementById("page-thankyou").style.opacity = "1";
+            document
+              .getElementById("page-thankyou")
+              .scrollIntoView({ behavior: "smooth" });
+          });
+        }, 800);
+      }
+  </body>
+</html>
