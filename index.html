@@ -13,6 +13,7 @@
     />
 
     <link rel="stylesheet" href="styles.css" />
+    <script src="translations.js"></script>
   </head>
   <body>
     <!-- Sky background -->
@@ -21,10 +22,22 @@
 
     <!-- Navigation dots -->
     <nav class="nav-dots" id="navDots">
-      <button class="nav-dot active" data-page="0" title="Entrada"></button>
-      <button class="nav-dot" data-page="1" title="La carta"></button>
-      <button class="nav-dot" data-page="2" title="Tu asiento"></button>
+      <button class="nav-dot active" data-page="0" title="Entrada" data-i18n-title="nav.entry"></button>
+      <button class="nav-dot" data-page="1" title="La carta" data-i18n-title="nav.letter"></button>
+      <button class="nav-dot" data-page="2" title="Tu asiento" data-i18n-title="nav.seats"></button>
     </nav>
+
+    <!-- Language Switcher & Wattpad -->
+    <div class="lang-switch">
+      <a href="https://www.wattpad.com" target="_blank" class="wattpad-btn" title="Read on Wattpad">
+        <!-- Simple Wattpad Icon (W) -->
+        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+          <path d="M6.5,2C4.5,2,3,3.5,3,5.5v13C3,20.5,4.5,22,6.5,22S10,20.5,10,18.5v-10h4v10c0,2,1.5,3.5,3.5,3.5s3.5-1.5,3.5-3.5 v-13C21,3.5,19.5,2,17.5,2S14,3.5,14,5.5v7h-4v-7C10,3.5,8.5,2,6.5,2z"/>
+        </svg>
+      </a>
+      <button class="lang-btn active" data-lang="es">ES</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
 
     <!-- ══════════════════════════════════════════════
        PAGE 1 – ENTRADA
@@ -41,18 +54,19 @@
               'block';
           "
         />
-        <div class="logo-text-fallback">Trip to Eden</div>
-        <span class="logo-subtitle">a journey to your other half</span>
+        <div class="logo-text-fallback" data-i18n="entry.fallbackTitle">Trip to Eden</div>
+        <span class="logo-subtitle" data-i18n="entry.subtitle">a journey to your other half</span>
       </div>
 
       <div class="entry-form">
         <div class="input-field-wrap">
-          <label class="input-label" for="nameInput">¿Cuál es tu nombre?</label>
+          <label class="input-label" for="nameInput" data-i18n="entry.labelName">¿Cuál es tu nombre?</label>
           <input
             class="name-input"
             id="nameInput"
             type="text"
             placeholder=" "
+            data-i18n-placeholder="entry.placeholderName" 
             autocomplete="off"
             spellcheck="false"
           />
@@ -60,7 +74,7 @@
           <div class="input-shimmer"></div>
         </div>
 
-        <button class="btn-enter" id="btnEnter">Continuar</button>
+        <button class="btn-enter" id="btnEnter" data-i18n="entry.btnEnter">Continuar</button>
       </div>
     </section>
 
@@ -88,17 +102,17 @@
         >
           ✉
         </div>
-        <span class="click-hint">— toca para abrir —</span>
+        <span class="click-hint" data-i18n="letter.clickHint">— toca para abrir —</span>
       </div>
     </section>
 
     <!-- Puzzle overlay -->
     <div class="puzzle-overlay" id="puzzleOverlay">
       <div class="puzzle-box">
-        <p class="puzzle-title">desliza para abrir el sobre</p>
+        <p class="puzzle-title" data-i18n="letter.puzzleTitle">desliza para abrir el sobre</p>
         <div class="slider-track" id="sliderTrack">
           <div class="slider-fill" id="sliderFill"></div>
-          <span class="slider-label" id="sliderLabel">desliza →</span>
+          <span class="slider-label" id="sliderLabel" data-i18n="letter.sliderLabel">desliza →</span>
           <div class="slider-handle" id="sliderHandle"></div>
         </div>
       </div>
@@ -106,8 +120,8 @@
 
     <!-- Letter content card -->
     <div class="letter-card-overlay" id="letterOverlay">
-      <div class="letter-card">
-        <button class="letter-close" id="letterClose">× CERRAR</button>
+      <div class="letter-card" id="letterCard">
+        <button class="letter-close" id="letterClose" data-i18n="letter.closeBtn">× CERRAR</button>
 
         <img
           class="letter-logo"
@@ -118,16 +132,16 @@
 
         <div class="letter-divider"></div>
 
-        <p class="letter-salutation" id="letterSalutation">Querida,</p>
+        <p class="letter-salutation" id="letterSalutation" data-i18n="letter.salutation">Querida,</p>
 
         <p class="letter-body">
-          Has sido seleccionada para participar en
-          <strong>Trip to Eden</strong>. <br /><br />
-          Somos una startup especializada en encontrar a tu media naranja.
-          Deberás rellenar un breve formulario y seguir unos sencillos pasos.
+          <span data-i18n="letter.body1">Has sido seleccionada para participar en</span>
+          <strong data-i18n="letter.bodySpan">Trip to Eden</strong><span data-i18n="letter.body2">.</span> <br /><br />
+          <span data-i18n="letter.body3">Somos una startup especializada en encontrar a tu media naranja.
+          Deberás rellenar un breve formulario y seguir unos sencillos pasos.</span>
           <br /><br />
-          Sé sincera en tus respuestas, y déjalo todo en nuestras manos.<br />
-          El amor verdadero te espera al otro lado del cielo.
+          <span data-i18n="letter.body4">Sé sincera en tus respuestas, y déjalo todo en nuestras manos.</span><br />
+          <span data-i18n="letter.body5">El amor verdadero te espera al otro lado del cielo.</span>
         </p>
 
         <div class="letter-divider"></div>
@@ -142,8 +156,8 @@
   ══════════════════════════════════════════════ -->
     <section class="section" id="page-seats">
       <div class="seats-header">
-        <h2 class="seats-title">Elige tu asiento</h2>
-        <p class="seats-subtitle">cada lugar guarda una experiencia distinta</p>
+        <h2 class="seats-title" data-i18n="seats.headerTitle">Elige tu asiento</h2>
+        <p class="seats-subtitle" data-i18n="seats.headerSubtitle">cada lugar guarda una experiencia distinta</p>
       </div>
 
       <div class="cabin" id="cabin">
@@ -151,7 +165,7 @@
       </div>
 
       <div class="btn-takeoff-wrap">
-        <button class="btn-takeoff" id="btnTakeoff">✦ &nbsp; Despegar</button>
+        <button class="btn-takeoff" id="btnTakeoff" data-i18n="seats.btnTakeoff">✦ &nbsp; Despegar</button>
       </div>
     </section>
 
@@ -173,8 +187,8 @@
         <span class="form-progress-label" id="formProgressLabel">1 / 12</span>
         <div class="form-question-wrap" id="formQuestionWrap"></div>
         <div class="form-nav">
-          <button class="form-nav-btn" id="formPrev">‹ &nbsp;Anterior</button>
-          <button class="form-nav-btn primary" id="formNext">
+          <button class="form-nav-btn" id="formPrev" data-i18n="form.prev">‹ &nbsp;Anterior</button>
+          <button class="form-nav-btn primary" id="formNext" data-i18n="form.next">
             Siguiente &nbsp;›
           </button>
         </div>
@@ -197,14 +211,14 @@
           onerror="this.style.display = 'none'"
         />
         <div class="ty-divider"></div>
-        <p class="ty-title">Tu historia comienza ahora.</p>
+        <p class="ty-title" data-i18n="thankyou.title">Tu historia comienza ahora.</p>
         <p class="ty-body">
-          Hemos recibido tu alma. Nuestro equipo estudiará cada respuesta con el
-          cuidado que mereces.<br /><br />Cuando el momento sea el correcto, el
-          cielo te enviará una señal.
+          <span data-i18n="thankyou.body">Hemos recibido tu alma. Nuestro equipo estudiará cada respuesta con el
+            cuidado que mereces.<br /><br />Cuando el momento sea el correcto, el
+            cielo te enviará una señal.</span>
         </p>
         <p class="ty-seal">✦</p>
-        <p class="ty-sign">con cariño, Trip to Eden</p>
+        <p class="ty-sign" data-i18n="thankyou.sign">con cariño, Trip to Eden</p>
       </div>
     </div>
 
