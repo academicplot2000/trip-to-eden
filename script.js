@@ -132,6 +132,65 @@ function spawnClouds() {
 
 spawnClouds();
 
+/* ─── Internationalization ────────────────────────────────────── */
+let currentLang = "es";
+
+function setLanguage(lang) {
+  if (!TRANSLATIONS[lang]) return;
+  currentLang = lang;
+  
+  // Update buttons
+  document.querySelectorAll(".lang-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.lang === lang);
+  });
+
+  updateContent();
+}
+
+function updateContent() {
+  const t = TRANSLATIONS[currentLang];
+
+  // 1. Static text with data-i18n
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.dataset.i18n;
+    const val = getNestedTranslation(t, key);
+    if (val) el.innerHTML = val;
+  });
+
+  // 2. Attributes (placeholder, title)
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    const val = getNestedTranslation(t, key);
+    if (val) el.placeholder = val;
+  });
+
+  document.querySelectorAll("[data-i18n-title]").forEach(el => {
+    const key = el.dataset.i18nTitle;
+    const val = getNestedTranslation(t, key);
+    if (val) el.title = val;
+  });
+
+  // 3. Dynamic content handling
+  updateGreeting();
+  updateSeatTooltips();
+  
+  // Re-render form if visible
+  if (document.getElementById("page-form").classList.contains("visible")) {
+    renderQuestion(currentQ);
+  }
+}
+
+function getNestedTranslation(obj, path) {
+  return path.split('.').reduce((prev, curr) => prev ? prev[curr] : null, obj);
+}
+
+// Language button events
+document.querySelectorAll(".lang-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    setLanguage(btn.dataset.lang);
+  });
+});
+
 /* ─── Nav dots & scroll tracking ─────────────────────────────── */
 const sections = ["page-entry", "page-letter", "page-seats"];
 const dots = document.querySelectorAll(".nav-dot");
@@ -171,12 +230,22 @@ nameInput.addEventListener("keydown", (e) => {
 
 function goToLetter() {
   userName = nameInput.value.trim() || "";
-  const greeting = document.getElementById("greetingName");
-  greeting.textContent = userName ? `Bienvenida, ${userName}` : "Bienvenida";
-  document.getElementById("letterSalutation").textContent = userName
-    ? `Querida ${userName},`
-    : "Querida,";
+  updateGreeting();
   document.getElementById("page-letter").scrollIntoView({ behavior: "smooth" });
+}
+
+function updateGreeting() {
+  const t = TRANSLATIONS[currentLang];
+  const greetingEl = document.getElementById("greetingName");
+  const letterSalutationEl = document.getElementById("letterSalutation");
+  
+  if (userName) {
+    greetingEl.textContent = t.greeting.withName.replace("{name}", userName);
+    letterSalutationEl.textContent = t.letter.salutationWithName.replace("{name}", userName);
+  } else {
+    greetingEl.textContent = t.greeting.default;
+    letterSalutationEl.textContent = t.letter.salutation;
+  }
 }
 
 /* ─── Page 2 – Envelope & Slider ─────────────────────────────── */
@@ -273,28 +342,8 @@ window.addEventListener("touchmove", (e) => doDrag(e.touches[0].clientX));
 window.addEventListener("touchend", () => endDrag());
 
 /* ─── Page 3 – Seat map ───────────────────────────────────────── */
-const SEAT_INFO = {
-  window: {
-    icon: "🌅",
-    title: "Asiento de ventanilla",
-    desc: "El horizonte es tuyo. Contempla el cielo despejado y siente la suave luz del amanecer mientras el mundo queda atrás.",
-  },
-  innerLeft: {
-    icon: "🌸",
-    title: "Asiento interior izquierdo",
-    desc: "Rodeada de tranquilidad. Un aroma suave a flores envuelve el ambiente, perfecto para reflexionar en calma.",
-  },
-  innerRight: {
-    icon: "✨",
-    title: "Asiento interior derecho",
-    desc: "Lleno de luz difusa y calidez. Cada instante aquí vibra con una energía serena y misteriosa.",
-  },
-  aisle: {
-    icon: "🕊️",
-    title: "Asiento de pasillo",
-    desc: "Libertad y movimiento. Eres la primera en alzar el vuelo y la primera en descubrir lo que te espera.",
-  },
-};
+/* ─── Page 3 – Seat map ───────────────────────────────────────── */
+// SEAT_INFO is now in TRANSLATIONS because we need multi-language support
 
 const ROWS = ["A", "B", "C", "D"];
 const cabin = document.getElementById("cabin");
@@ -311,13 +360,9 @@ ROWS.forEach((row, ri) => {
 
   // 4 seats: [window, inner | aisle, inner-right, window]
   // Layout: W  I  |  I  W
-  const seatTypes = ["window", "innerLeft", "innerRight", "aisle"];
-  const labels = [`${row}1`, `${row}2`, `${row}3`, `${row}4`];
-  const types = ["window", "innerLeft", "aisle", "window"]; // per column
-
   [
-    { id: `${row}1`, type: "window" },
-    { id: `${row}2`, type: "innerLeft" },
+    { id: `${row}1`, type: "seatWindow" },
+    { id: `${row}2`, type: "seatInnerLeft" },
   ].forEach((s) => rowEl.appendChild(makeSeat(s.id, s.type)));
 
   const aisle = document.createElement("div");
@@ -325,18 +370,21 @@ ROWS.forEach((row, ri) => {
   rowEl.appendChild(aisle);
 
   [
-    { id: `${row}3`, type: "innerRight" },
-    { id: `${row}4`, type: "window" },
+    { id: `${row}3`, type: "seatInnerRight" },
+    { id: `${row}4`, type: "seatWindow" },
   ].forEach((s) => rowEl.appendChild(makeSeat(s.id, s.type)));
 
   cabin.appendChild(rowEl);
 });
 
 function makeSeat(id, type) {
-  const info = SEAT_INFO[type];
+  // Use a data attribute to store type for dynamic lookup
   const seat = document.createElement("div");
   seat.classList.add("seat");
   seat.setAttribute("data-id", id);
+  seat.setAttribute("data-type", type); // Store type key
+  
+  seat.addEventListener("click", () => handleSeatClick(seat));
 
   const ping = document.createElement("div");
   ping.classList.add("seat-ping");
@@ -344,22 +392,60 @@ function makeSeat(id, type) {
 
   const tip = document.createElement("div");
   tip.classList.add("seat-tooltip");
-  tip.innerHTML = `
-    <div class="tooltip-icon">${info.icon}</div>
-    <div class="tooltip-seat-id">Asiento ${id}</div>
-    <div class="tooltip-body">${info.desc}</div>
-  `;
-
   seat.appendChild(tip);
+  
   return seat;
 }
+
+let selectedSeat = null;
+
+function handleSeatClick(seatEl) {
+  // If clicking same seat -> deselect
+  if (selectedSeat === seatEl) {
+    selectedSeat.classList.remove("selected");
+    selectedSeat = null;
+    return;
+  }
+  
+  // If another is selected -> desired logic: unselect old, select new
+  if (selectedSeat) {
+    selectedSeat.classList.remove("selected");
+  }
+  
+  selectedSeat = seatEl;
+  selectedSeat.classList.add("selected");
+}
+
+function updateSeatTooltips() {
+  const t = TRANSLATIONS[currentLang].seats;
+  const icon = "✈️"; // Consistent icon for all seats as requested
+  
+  document.querySelectorAll(".seat").forEach(seat => {
+    const type = seat.dataset.type;
+    const id = seat.dataset.id;
+    const info = t[type];
+    const tip = seat.querySelector(".seat-tooltip");
+    
+    if (info && tip) {
+      tip.innerHTML = `
+        <div class="tooltip-icon">${icon}</div>
+        <div class="tooltip-seat-id">${t.seatTooltipId.replace("{id}", id)}</div>
+        <div class="tooltip-body">${info.desc}</div>
+      `;
+    }
+  });
+}
+
+// Initial call to render tooltips
+updateSeatTooltips();
 
 /* ─── Takeoff button ─────────────────────────────────────────── */
 document.getElementById("btnTakeoff").addEventListener("click", () => {
   const btn = document.getElementById("btnTakeoff");
   btn.style.opacity = "0.5";
   btn.style.pointerEvents = "none";
-  btn.innerHTML = "✦ &nbsp; Despegando…";
+  const t = TRANSLATIONS[currentLang].seats;
+  btn.innerHTML = t.btnTakeoffActive;
   setTimeout(startCountdown, 800);
 });
 
@@ -389,126 +475,8 @@ function startCountdown() {
 }
 
 /* ─── Form logic ─────────────────────────────────────────────── */
-const QUESTIONS = [
-  {
-    id: "q1",
-    type: "single",
-    question: "¿Crees en el amor a primera vista?",
-    sub: "Esa chispa que lo cambia todo en un instante.",
-    options: ["Completamente", "Puede que sí", "Soy escéptica", "No lo creo"],
-  },
-  {
-    id: "q2",
-    type: "single",
-    question: "¿Crees en el destino?",
-    sub: "Que hay alguien escrito para ti en algún lugar del universo.",
-    options: [
-      "Sí, lo siento profundamente",
-      "Creo que el destino se construye",
-      "A veces lo dudo",
-      "Prefiero la casualidad",
-    ],
-  },
-  {
-    id: "q3",
-    type: "slider_range",
-    question: "¿Qué importancia tiene el aspecto físico?",
-    sub: "Desliza para indicar cuánto peso tiene en tu decisión.",
-    min: 0,
-    max: 10,
-    labels: ["Nada", "Es lo primero"],
-  },
-  {
-    id: "q4",
-    type: "multi",
-    question: "¿Qué cualidades buscas en tu media naranja?",
-    sub: "Elige todas las que resuenen contigo.",
-    options: [
-      "Sentido del humor",
-      "Inteligencia emocional",
-      "Ambición",
-      "Ternura",
-      "Aventurero/a",
-      "Estabilidad",
-      "Creatividad",
-      "Lealtad",
-    ],
-  },
-  {
-    id: "q5",
-    type: "slider_range",
-    question: "¿Introvertido/a o extrovertido/a?",
-    sub: "Describe cómo te imaginas a esa persona en sociedad.",
-    min: 0,
-    max: 10,
-    labels: ["Muy introvertido/a", "Muy extrovertido/a"],
-  },
-  {
-    id: "q6",
-    type: "text",
-    question: "Describe tu plan de cita perfecta.",
-    sub: "Con todo detalle. No hay respuesta incorrecta.",
-    placeholder: "Una cena tranquila al atardecer, tal vez junto al mar…",
-  },
-  {
-    id: "q7",
-    type: "single",
-    question: "¿Cómo prefieres que sea la relación al principio?",
-    sub: "El ritmo marca mucho el tono de todo lo que viene después.",
-    options: [
-      "Lenta y misteriosa",
-      "Natural y espontánea",
-      "Intensa desde el inicio",
-      "Que fluya sola",
-    ],
-  },
-  {
-    id: "q8",
-    type: "multi",
-    question: "¿Qué planes os imaginas compartiendo?",
-    sub: "Elige los que sientas como tuyos.",
-    options: [
-      "Viajes al extranjero",
-      "Noches en casa",
-      "Aventuras al aire libre",
-      "Conciertos y cultura",
-      "Proyectos en común",
-      "Cocinar juntos",
-      "Deporte",
-      "Lectura en silencio",
-    ],
-  },
-  {
-    id: "q9",
-    type: "slider_range",
-    question: "¿Qué equilibrio buscas entre independencia y unión?",
-    sub: "Cada pareja tiene su propia constelación.",
-    min: 0,
-    max: 10,
-    labels: ["Mucha independencia", "Siempre juntos"],
-  },
-  {
-    id: "q10",
-    type: "single",
-    question: "¿Qué te enamora primero de alguien?",
-    sub: "Ese pequeño detalle que lo cambia todo.",
-    options: ["La mirada", "La voz", "La forma de reír", "Lo que dice"],
-  },
-  {
-    id: "q11",
-    type: "text",
-    question:
-      "Si pudieras dejarle una nota a tu media naranja hoy, ¿qué le dirías?",
-    sub: "Escríbele como si pudiera leerla ahora mismo.",
-    placeholder: "Hola, no sé dónde estás, pero…",
-  },
-  {
-    id: "q12",
-    type: "signature",
-    question: "Para finalizar, firma aquí.",
-    sub: "Tu firma es tu sello. Confirma que todo lo que has respondido viene de tu corazón.",
-  },
-];
+// QUESTIONS are in TRANSLATIONS[currentLang].form.questions
+// We removed the static const QUESTIONS array.
 
 let currentQ = 0;
 const answers = {};
@@ -520,28 +488,35 @@ function showFormPage() {
   requestAnimationFrame(() => {
     pf.scrollIntoView({ behavior: "smooth" });
   });
-  // Add form nav dot
-  const nd = document.createElement("button");
-  nd.classList.add("nav-dot");
-  nd.dataset.page = "3";
-  nd.title = "Formulario";
-  nd.addEventListener("click", () =>
-    document.getElementById("page-form").scrollIntoView({ behavior: "smooth" }),
-  );
-  document.getElementById("navDots").appendChild(nd);
+  
+  // Add form nav dot if not exists
+  if (!document.querySelector('.nav-dot[data-page="3"]')) {
+    const nd = document.createElement("button");
+    nd.classList.add("nav-dot");
+    nd.dataset.page = "3";
+    nd.title = TRANSLATIONS[currentLang].nav.form; 
+    nd.setAttribute("data-i18n-title", "nav.form");
+    nd.addEventListener("click", () =>
+      document.getElementById("page-form").scrollIntoView({ behavior: "smooth" }),
+    );
+    document.getElementById("navDots").appendChild(nd);
+  }
+  
   renderQuestion(0);
 }
 
 function renderQuestion(idx) {
+  const questions = TRANSLATIONS[currentLang].form.questions;
   currentQ = idx;
-  const q = QUESTIONS[idx];
+  const q = questions[idx];
   const container = document.getElementById("formQuestionWrap");
+  const tForm = TRANSLATIONS[currentLang].form;
 
   // Update progress
-  const pct = (idx / (QUESTIONS.length - 1)) * 100;
+  const pct = (idx / (questions.length - 1)) * 100;
   document.getElementById("formProgressFill").style.width = pct + "%";
   document.getElementById("formProgressLabel").textContent =
-    `${idx + 1} / ${QUESTIONS.length}`;
+    `${idx + 1} / ${questions.length}`;
 
   // Fade out then swap
   container.style.opacity = "0";
@@ -560,15 +535,24 @@ function renderQuestion(idx) {
   // Prev/Next buttons
   const prevBtn = document.getElementById("formPrev");
   const nextBtn = document.getElementById("formNext");
+  
   prevBtn.style.opacity = idx === 0 ? "0.2" : "1";
   prevBtn.style.pointerEvents = idx === 0 ? "none" : "all";
-  nextBtn.innerHTML =
-    idx === QUESTIONS.length - 1 ? "Enviar &nbsp;✦" : "Siguiente &nbsp;›";
+  
+  if (idx === questions.length - 1) {
+    nextBtn.innerHTML = tForm.send;
+  } else {
+    nextBtn.innerHTML = tForm.next;
+  }
 }
 
 function buildQuestion(q) {
+  const tForm = TRANSLATIONS[currentLang].form;
+  // Fallback if questions index or array length mismatch
+  const qIndex = TRANSLATIONS[currentLang].form.questions.indexOf(q); 
+  
   let html = `
-    <p class="fq-label">Pregunta ${QUESTIONS.indexOf(q) + 1}</p>
+    <p class="fq-label">${tForm.questionLabel.replace("{n}", qIndex + 1)}</p>
     <h2 class="fq-title">${q.question}</h2>
     <p class="fq-sub">${q.sub || ""}</p>
   `;
@@ -586,7 +570,7 @@ function buildQuestion(q) {
     q.options.forEach((opt) => {
       html += `<button class="fq-option" data-val="${opt}">${opt}</button>`;
     });
-    html += `</div><p class="fq-hint">Puedes elegir varias</p>`;
+    html += `</div><p class="fq-hint">${tForm.hintMulti}</p>`;
   }
 
   if (q.type === "slider_range") {
@@ -614,7 +598,7 @@ function buildQuestion(q) {
     html += `
       <div class="fq-sig-wrap">
         <canvas class="sig-canvas" id="sigCanvas"></canvas>
-        <button class="sig-clear" id="sigClear">Borrar</button>
+        <button class="sig-clear" id="sigClear">${tForm.sigClear}</button>
       </div>`;
   }
 
@@ -821,7 +805,8 @@ document.getElementById("formPrev").addEventListener("click", () => {
 });
 
 document.getElementById("formNext").addEventListener("click", () => {
-  if (currentQ < QUESTIONS.length - 1) {
+  const tQuestions = TRANSLATIONS[currentLang].form.questions;
+  if (currentQ < tQuestions.length - 1) {
     renderQuestion(currentQ + 1);
   } else {
     submitForm();
